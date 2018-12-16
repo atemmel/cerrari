@@ -100,8 +100,8 @@ int main()
 	{
 		auto & seg = segments[i];
 		seg.start.y = seg.finish.y = roadHeight;
-		seg.start.z = i * segmentLength;
-		seg.finish.z = (i + 1) * segmentLength;
+		seg.start.z = i * -segmentLength+segmentLength;
+		seg.finish.z = (i + 1) * -segmentLength+segmentLength;
 	}
 
 	float velocity = 0.f, maxVelocity = 200.f;
@@ -175,6 +175,8 @@ int main()
 
 			auto screen1 = worldToScreen(seg.start);
 			auto screen2 = worldToScreen(seg.finish);
+
+			if(screen2.y > 768.f) continue;
 
 			dbg1.setPosition(screen1.x, screen1.y);
 
