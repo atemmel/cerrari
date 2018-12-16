@@ -87,18 +87,18 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 128u;
-	std::vector<sf::Vector3f> segments(n_segs);
+	size_t n_segs = 2;
+	std::vector<sf::Vector3f> segments(n_segs * 2);
 
 	for(size_t i = 0u; i < segments.size(); i++)
 	{
 		sf::Vector3f & seg = segments[i];
 		seg.y = roadHeight;
-		seg.z = (i / n_segs * 200.f);
+		seg.z = (float)i / n_segs * 200.f;
 	}
 
-	sf::Vector3f start = {0.f, roadHeight, 0.f}, 
-		end = {0.f, roadHeight, 200.f};
+	//sf::Vector3f start = {0.f, roadHeight, 0.f}, 
+		//end = {0.f, roadHeight, 200.f};
 
 	float velocity = 0.f, maxVelocity = 20.f;
 
@@ -142,28 +142,31 @@ int main()
 
 		//---------
 
-		start.z += velocity;
-		end.z += velocity;
+		for(auto & s : segments) s.z += velocity;
+		//start.z += velocity;
+		//end.z += velocity;
 		
-		auto screen1 = worldToScreen(start);
-		auto screen2 = worldToScreen(end);
-		dbg1.setPosition(screen1.x, screen1.y);
-		dbg2.setPosition(screen2.x, screen2.y);
-
-		moveQuad(quad,
-				{screen1.x, screen1.y}, screen1.z,
-				{screen2.x, screen2.y}, screen2.z,
-				sf::Color(100, 100, 100));
-
 		//---------
 
 		window.setView(view);
 		window.clear();
 		window.draw(background);
 
-		window.draw(quad);
-		window.draw(dbg1);
-		window.draw(dbg2);
+		for(size_t i = 0u; i < segments.size() - 1; i++)
+		{
+			auto screen1 = worldToScreen(segments[i]);
+			auto screen2 = worldToScreen(segments[i + 1]);
+
+			dbg1.setPosition(screen1.x, screen1.y);
+
+			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
+					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120));
+
+
+			window.draw(quad);
+			window.draw(dbg1);
+		}
+
 		window.display();
 	}
 }
