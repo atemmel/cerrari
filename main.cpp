@@ -7,6 +7,8 @@ const static sf::VideoMode defaultMode(1024, 768);
 
 static bool fullscreen = 0;
 
+sf::RectangleShape background(sf::Vector2f(1024.f, 768.f));
+
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vector2f far, float farWidth, sf::Color color)
 {
 	const sf::Vector2f halfNearWidth	= {nearWidth	* 0.5f, 0.f};
@@ -20,23 +22,8 @@ void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vec
 	for(int i = 0; i < 4; i++) arr[i].color = color;
 }
 
-int main()
+sf::Vector3f worldToScreen(sf::Vector3f world)
 {
-	sf::RectangleShape background(sf::Vector2f(1024.f, 768.f));
-	sf::RenderWindow window(defaultMode, "");
-
-	background.setFillColor(sf::Color(80, 0, 200));
-	window.setFramerateLimit(60u);
-
-	sf::View view = window.getView();
-	{
-		auto size = background.getSize();
-		view.setSize(size);
-		view.setCenter(size / 2.f);
-	}
-
-	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
-
 	// h = camera height
 	// w = camera to road distance
 	// d = camera to screen distance (think z)
@@ -62,12 +49,10 @@ int main()
 	// p = cres * d / cres.z
 	// s.x = (S.x/2) + (S.x/2 * p.x)
 	// s.y = (S.y/2) - (S.y/2 * p.y)
-	
+
 	float fov = 100.f;
 	float d = 1.f/tanf(fov * 0.5f);
 	sf::Vector3f camera	= {0.f, 0.f, 1000.f};
-	sf::Vector3f world	= {0.f, 200.f, 0.f};
-
 	sf::Vector3f outCamera = world - camera;
 
 	float scale = d / outCamera.z;
@@ -80,7 +65,28 @@ int main()
 	screen.y += halfSize.y * proj.y;
 	screen.z  = scale * roadWidth * halfSize.x;
 
-	std::cout << screen.x << ' ' << screen.y << '\n';
+	return screen;
+}
+
+int main()
+{
+	sf::RenderWindow window(defaultMode, "");
+
+	background.setFillColor(sf::Color(80, 0, 200));
+	window.setFramerateLimit(60u);
+
+	sf::View view = window.getView();
+	{
+		auto size = background.getSize();
+		view.setSize(size);
+		view.setCenter(size / 2.f);
+	}
+
+	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
+
+	
+	sf::Vector3f world	= {0.f, 200.f, 0.f};
+	sf::Vector3f screen = worldToScreen(world);
 
 	sf::CircleShape dbg(4.f);
 	dbg.setFillColor(sf::Color::Green);
@@ -109,16 +115,27 @@ int main()
 			}
 		}
 
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+		{
+			world.z -= 10.f;
+			std::cout << world.z << '\n';
+		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+		{
+			world.z += 10.f;
+			std::cout << world.z << '\n';
+		}
+
 		//---------
 		
+		screen = worldToScreen(world);
+		dbg.setPosition(screen.x, screen.y);
 
 		//---------
 
 		window.setView(view);
 		window.clear();
 		window.draw(background);
-
-
 
 		moveQuad(quad, 
 			{512.f, 500.f}, 300.f, 
