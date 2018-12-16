@@ -11,8 +11,13 @@ static bool fullscreen = 0;
 sf::RectangleShape background(sf::Vector2f(1024.f, 768.f));
 
 float fov = 100.f;
-float roadHeight = 220.f;
+float roadHeight = 1000.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
+
+struct Segment
+{
+	sf::Vector3f start, finish;
+};
 
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vector2f far, float farWidth, sf::Color color)
 {
@@ -59,7 +64,7 @@ sf::Vector3f worldToScreen(sf::Vector3f world)
 	sf::Vector3f outCamera = world - camera;
 
 	float scale = d / outCamera.z;
-	float roadWidth = 600.f;
+	float roadWidth = 2000.f;
 
 	sf::Vector2f proj(outCamera.x * scale, outCamera.y * scale);
 	sf::Vector2f halfSize = background.getSize() * 0.5f;
@@ -87,20 +92,19 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 2;
-	std::vector<sf::Vector3f> segments(n_segs * 2);
+	size_t n_segs = 100;
+	float segmentLength = 1600.f;
+	std::vector<Segment> segments(n_segs);
 
 	for(size_t i = 0u; i < segments.size(); i++)
 	{
-		sf::Vector3f & seg = segments[i];
-		seg.y = roadHeight;
-		seg.z = (float)i / n_segs * 200.f;
+		auto & seg = segments[i];
+		seg.start.y = seg.finish.y = roadHeight;
+		seg.start.z = i * segmentLength;
+		seg.finish.z = (i + 1) * segmentLength;
 	}
 
-	//sf::Vector3f start = {0.f, roadHeight, 0.f}, 
-		//end = {0.f, roadHeight, 200.f};
-
-	float velocity = 0.f, maxVelocity = 20.f;
+	float velocity = 0.f, maxVelocity = 200.f;
 
 	sf::CircleShape dbg1(4.f);
 	auto dbg2 = dbg1;
@@ -140,11 +144,22 @@ int main()
 		}
 		else velocity = 0.f;
 
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
+		{
+			fov -= 0.01;
+		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+		{
+			fov += 0.01;
+		}
+
 		//---------
 
-		for(auto & s : segments) s.z += velocity;
-		//start.z += velocity;
-		//end.z += velocity;
+		for(auto & s : segments) 
+		{
+			s.start.z += velocity;
+			s.finish.z += velocity;
+		}
 		
 		//---------
 
@@ -152,16 +167,19 @@ int main()
 		window.clear();
 		window.draw(background);
 
-		for(size_t i = 0u; i < segments.size() - 1; i++)
+		for(size_t i = 0u; i < segments.size(); i++)
 		{
-			auto screen1 = worldToScreen(segments[i]);
-			auto screen2 = worldToScreen(segments[i + 1]);
+			auto & seg = segments[i];
+
+			if(seg.finish.z > 220) continue;
+
+			auto screen1 = worldToScreen(seg.start);
+			auto screen2 = worldToScreen(seg.finish);
 
 			dbg1.setPosition(screen1.x, screen1.y);
 
 			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120));
-
 
 			window.draw(quad);
 			window.draw(dbg1);
