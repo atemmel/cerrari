@@ -1,4 +1,4 @@
-TARGET=tankom
+TARGET=cerrari
 LIBS=-lsfml-system -lsfml-graphics -lsfml-window
 
 $(TARGET): main.cpp

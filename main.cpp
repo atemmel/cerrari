@@ -80,7 +80,7 @@ int main()
 {
 	sf::RenderWindow window(defaultMode, "");
 
-	background.setFillColor(sf::Color(80, 0, 200));
+	background.setFillColor(sf::Color(80, 0, 200)); //TODO: Remove constant
 	window.setFramerateLimit(60u);
 
 	sf::View view = window.getView();
@@ -92,7 +92,7 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 100;
+	size_t n_segs = 5000;
 	float segmentLength = 1600.f;
 	std::vector<Segment> segments(n_segs);
 
@@ -105,6 +105,7 @@ int main()
 	}
 
 	float velocity = 0.f, maxVelocity = 200.f;
+	float turnVelocity = 40.f;
 
 	sf::CircleShape dbg1(4.f);
 	auto dbg2 = dbg1;
@@ -144,6 +145,15 @@ int main()
 		}
 		else velocity = 0.f;
 
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+		{
+			camera.x -= turnVelocity;
+		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+		{
+			camera.x += turnVelocity;
+		}
+
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
 		{
 			fov -= 0.01;
@@ -155,11 +165,7 @@ int main()
 
 		//---------
 
-		for(auto & s : segments) 
-		{
-			s.start.z += velocity;
-			s.finish.z += velocity;
-		}
+		camera.z -= velocity;
 		
 		//---------
 
@@ -171,17 +177,19 @@ int main()
 		{
 			auto & seg = segments[i];
 
-			if(seg.finish.z > 220) continue;
+			//Behind us
+			if(seg.finish.z > segmentLength) continue;
 
 			auto screen1 = worldToScreen(seg.start);
 			auto screen2 = worldToScreen(seg.finish);
 
-			if(screen2.y > 768.f) continue;
+			//To far ahead
+			if(screen2.y > 768.f || screen2.z < 60.f) continue; //TODO: Remove constant
 
 			dbg1.setPosition(screen1.x, screen1.y);
 
 			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
-					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120));
+					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
 
 			window.draw(quad);
 			window.draw(dbg1);
