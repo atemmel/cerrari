@@ -14,9 +14,18 @@ float fov = 100.f;
 float roadHeight = 1000.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
 
+namespace Curve
+{
+	float None = 0.f;
+	float Weak = 5.f;
+	float Medium = 10.f;
+	float Sharp = 20.f;
+};
+
 struct Segment
 {
 	sf::Vector3f start, finish;
+	float curve;
 };
 
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vector2f far, float farWidth, sf::Color color)
@@ -79,11 +88,11 @@ sf::Vector3f worldToScreen(sf::Vector3f world)
 int main()
 {
 	sf::RenderWindow window(defaultMode, "");
+	sf::View view(window.getView());
 
 	background.setFillColor(sf::Color(80, 0, 200)); //TODO: Remove constant
 	window.setFramerateLimit(60u);
 
-	sf::View view = window.getView();
 	{
 		auto size = background.getSize();
 		view.setSize(size);
@@ -92,7 +101,7 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 5000;
+	size_t n_segs = 50;
 	float segmentLength = 1600.f;
 	std::vector<Segment> segments(n_segs);
 
@@ -102,7 +111,12 @@ int main()
 		seg.start.y = seg.finish.y = roadHeight;
 		seg.start.z = i * -segmentLength+segmentLength;
 		seg.finish.z = (i + 1) * -segmentLength+segmentLength;
+		seg.curve = Curve::Sharp;
 	}
+
+	//for(size_t i = 10u; i < 20u; i++) segments[i].curve = Curve::Medium;
+	//for(size_t i = 20u; i < 30u; i++) segments[i].curve = Curve::Weak;
+	//for(size_t i = 30u; i < 50u; i++) segments[i].curve = Curve::None;
 
 	float velocity = 0.f, maxVelocity = 200.f;
 	float turnVelocity = 40.f;
@@ -173,7 +187,11 @@ int main()
 		window.clear();
 		window.draw(background);
 
-		for(size_t i = 0u; i < segments.size(); i++)
+		size_t base = camera.z / -segmentLength;
+		float dx = segments[base].curve;
+		float x = 0.f;
+
+		for(size_t i = base; i < segments.size(); i++)
 		{
 			auto & seg = segments[i];
 
@@ -183,7 +201,13 @@ int main()
 			auto screen1 = worldToScreen(seg.start);
 			auto screen2 = worldToScreen(seg.finish);
 
-			//To far ahead
+			screen1.x += x;
+			screen2.x += x + dx;
+
+			x += dx;
+			dx = seg.curve;
+
+			//Too far ahead
 			if(screen2.y > 768.f || screen2.z < 60.f) continue; //TODO: Remove constant
 
 			dbg1.setPosition(screen1.x, screen1.y);
