@@ -41,6 +41,23 @@ void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vec
 	for(int i = 0; i < 4; i++) arr[i].color = color;
 }
 
+float easeIn(float a, float b, float scale)
+{
+	return a + (b - a) * (scale * scale);
+}
+
+float easeOut(float a, float b, float scale)
+{
+	const float diff = 1.f - scale;
+	return a + (b - a) * (1.f - diff * diff);
+}
+
+float getDecimal(float a)
+{
+	int b = a;
+	return a - b;
+}
+
 sf::Vector3f worldToScreen(sf::Vector3f world)
 {
 	// h = camera height
@@ -187,9 +204,10 @@ int main()
 		window.clear();
 		window.draw(background);
 
-		size_t base = camera.z / -segmentLength;
-		float dx = segments[base].curve;
-		float x = 0.f;
+		float base = camera.z / -segmentLength;
+		float ddx = segments[base].curve;
+		float dx = -getDecimal(base) * ddx;
+		std::cout << camera.z << ' ' << segmentLength << ' ' << base << ' ' << getDecimal(base) << ' ' << ddx << '\n' << dx << '\n';
 
 		for(size_t i = base; i < segments.size(); i++)
 		{
@@ -201,11 +219,11 @@ int main()
 			auto screen1 = worldToScreen(seg.start);
 			auto screen2 = worldToScreen(seg.finish);
 
-			screen1.x += x;
-			screen2.x += x + dx;
+			screen1.x += dx;
+			screen2.x += dx + ddx;
 
-			x += dx;
-			dx = seg.curve;
+			dx += ddx;
+			ddx = seg.curve;
 
 			//Too far ahead
 			if(screen2.y > 768.f || screen2.z < 60.f) continue; //TODO: Remove constant
