@@ -28,7 +28,8 @@ struct Segment
 	float curve;
 };
 
-void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, sf::Vector2f far, float farWidth, sf::Color color)
+void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
+		sf::Vector2f far, float farWidth, sf::Color color)
 {
 	const sf::Vector2f halfNearWidth	= {nearWidth	* 0.5f, 0.f};
 	const sf::Vector2f halfFarWidth		= {farWidth		* 0.5f, 0.f};
@@ -58,7 +59,7 @@ float getDecimal(float a)
 	return a - b;
 }
 
-sf::Vector3f worldToScreen(sf::Vector3f world)
+sf::Vector3f worldToScreen(const sf::Vector3f & world)
 {
 	// h = camera height
 	// w = camera to road distance
@@ -86,11 +87,11 @@ sf::Vector3f worldToScreen(sf::Vector3f world)
 	// s.x = (S.x/2) + (S.x/2 * p.x)
 	// s.y = (S.y/2) - (S.y/2 * p.y)
 
-	float d = 1.f/tanf(fov * 0.5f);
-	sf::Vector3f outCamera = world - camera;
+	const float d = 1.f/tanf(fov * 0.5f);
+	const sf::Vector3f outCamera = world - camera;
 
-	float scale = d / outCamera.z;
-	float roadWidth = 2000.f;
+	const float scale = d / outCamera.z;
+	const float roadWidth = 2000.f;
 
 	sf::Vector2f proj(outCamera.x * scale, outCamera.y * scale);
 	sf::Vector2f halfSize = background.getSize() * 0.5f;
@@ -102,13 +103,19 @@ sf::Vector3f worldToScreen(sf::Vector3f world)
 	return screen;
 }
 
+
+
 int main()
 {
 	sf::RenderWindow window(defaultMode, "");
 	sf::View view(window.getView());
+	sf::Texture playerTexture;
+	sf::Sprite playerSprite;
 
 	background.setFillColor(sf::Color(80, 0, 200)); //TODO: Remove constant
 	window.setFramerateLimit(60u);
+	playerTexture.loadFromFile("ferrari.png");
+	playerSprite.setTexture(playerTexture);
 
 	{
 		auto size = background.getSize();
@@ -128,12 +135,12 @@ int main()
 		seg.start.y = seg.finish.y = roadHeight;
 		seg.start.z = i * -segmentLength+segmentLength;
 		seg.finish.z = (i + 1) * -segmentLength+segmentLength;
-		seg.curve = Curve::Sharp;
+		seg.curve = Curve::None;
 	}
 
 	//for(size_t i = 10u; i < 20u; i++) segments[i].curve = Curve::Medium;
 	//for(size_t i = 20u; i < 30u; i++) segments[i].curve = Curve::Weak;
-	//for(size_t i = 30u; i < 50u; i++) segments[i].curve = Curve::None;
+	for(size_t i = 30u; i < 50u; i++) segments[i].curve = -Curve::Medium;
 
 	float velocity = 0.f, maxVelocity = 200.f;
 	float turnVelocity = 40.f;
@@ -207,9 +214,9 @@ int main()
 		float base = camera.z / -segmentLength;
 		float ddx = segments[base].curve;
 		float dx = -getDecimal(base) * ddx;
-		std::cout << camera.z << ' ' << segmentLength << ' ' << base << ' ' << getDecimal(base) << ' ' << ddx << '\n' << dx << '\n';
+		//std::cout << camera.z << ' ' << segmentLength << ' ' << base << ' ' << getDecimal(base) << ' ' << ddx << '\n' << dx << '\n';
 
-		for(size_t i = base; i < segments.size(); i++)
+		for(size_t i = base; i < segments.size() && i < base + 30; i++)
 		{
 			auto & seg = segments[i];
 
@@ -228,13 +235,13 @@ int main()
 			//Too far ahead
 			if(screen2.y > 768.f || screen2.z < 60.f) continue; //TODO: Remove constant
 
-			dbg1.setPosition(screen1.x, screen1.y);
+			//dbg1.setPosition(screen1.x, screen1.y);
 
 			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
 
 			window.draw(quad);
-			window.draw(dbg1);
+			//window.draw(dbg1);
 		}
 
 		window.display();
