@@ -59,6 +59,11 @@ float getDecimal(float a)
 	return a - b;
 }
 
+float normalize(float min, float max, float value)
+{
+	return (value - min) / (max - min);
+}
+
 sf::Vector3f worldToScreen(const sf::Vector3f & world)
 {
 	// h = camera height
@@ -125,7 +130,7 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 50;
+	size_t n_segs = 500;
 	float segmentLength = 1600.f;
 	std::vector<Segment> segments(n_segs);
 
@@ -138,17 +143,28 @@ int main()
 		seg.curve = Curve::None;
 	}
 
-	//for(size_t i = 10u; i < 20u; i++) segments[i].curve = Curve::Medium;
-	//for(size_t i = 20u; i < 30u; i++) segments[i].curve = Curve::Weak;
-	for(size_t i = 30u; i < 50u; i++) segments[i].curve = -Curve::Medium;
+	for(size_t i = 30u; i < 50u; i++) 
+	{
+		float s = normalize(30u, 50u, i);
+		segments[i].curve = easeIn(Curve::None, -Curve::Medium, s);
+	}
+	for(size_t i = 50u; i < 70u; i++) 
+	{
+		segments[i].curve = -Curve::Medium;
+	}
+	for(size_t i = 70u; i < 90u; i++) 
+	{
+		float s = normalize(70u, 90u, i);
+		segments[i].curve = easeOut(-Curve::Medium, Curve::None, s);
+	}
 
 	float velocity = 0.f, maxVelocity = 200.f;
 	float turnVelocity = 40.f;
 
-	sf::CircleShape dbg1(4.f);
-	auto dbg2 = dbg1;
-	dbg1.setFillColor(sf::Color::Green);
-	dbg2.setFillColor(sf::Color::Red);
+	//sf::CircleShape dbg1(4.f);
+	//auto dbg2 = dbg1;
+	//dbg1.setFillColor(sf::Color::Green);
+	//dbg2.setFillColor(sf::Color::Red);
 
 	while(window.isOpen())
 	{
@@ -214,7 +230,6 @@ int main()
 		float base = camera.z / -segmentLength;
 		float ddx = segments[base].curve;
 		float dx = -getDecimal(base) * ddx;
-		//std::cout << camera.z << ' ' << segmentLength << ' ' << base << ' ' << getDecimal(base) << ' ' << ddx << '\n' << dx << '\n';
 
 		for(size_t i = base; i < segments.size() && i < base + 30; i++)
 		{
