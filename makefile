@@ -1,8 +1,9 @@
 TARGET=cerrari
 LIBS=-lsfml-system -lsfml-graphics -lsfml-window
+SRC=main.cpp road.cpp math.cpp
 
-$(TARGET): main.cpp
-	g++ $(LIBS) -o $(TARGET) main.cpp
+$(TARGET): $(SRC) 
+	g++ $(LIBS) -o $(TARGET) $(SRC)
 
 test: $(TARGET)
 	./$(TARGET)

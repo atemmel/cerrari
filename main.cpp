@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include "math.hpp"
+#include "road.hpp"
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 const static sf::VideoMode defaultMode(1024, 768);
 
@@ -11,26 +12,9 @@ static bool fullscreen = 0;
 sf::RectangleShape background(sf::Vector2f(1024.f, 768.f));
 
 float fov = 100.f;
-float roadHeight = 1000.f;
-float segmentLength = 1600.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
-sf::Vector3f player = {0.f, roadHeight, -(segmentLength * 3.f)};
+sf::Vector3f player = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
 
-namespace Curve
-{
-	float None = 0.f;
-	float Weak = 5.f;
-	float Medium = 10.f;
-	float Sharp = 20.f;
-};
-
-/*
-struct Segment
-{
-	sf::Vector3f start;//, finish;
-	//float curve;
-};
-*/
 
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
 		sf::Vector2f far, float farWidth, sf::Color color)
@@ -46,8 +30,7 @@ void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth,
 	for(int i = 0; i < 4; i++) arr[i].color = color;
 }
 
-
-sf::Vector3f worldToScreen(const sf::Vector3f & world)
+sf::Vector3f worldToScreen(const sf::Vector3f & world, float width)
 {
 	// h = camera height
 	// w = camera to road distance
@@ -76,7 +59,6 @@ sf::Vector3f worldToScreen(const sf::Vector3f & world)
 	// s.y = (S.y/2) - (S.y/2 * p.y)
 
 	const float d = 1.f/tanf(fov * 0.5f);
-	const float roadWidth = 2000.f;
 	const sf::Vector3f outCamera = world - camera;
 	const float scale = d / outCamera.z;
 
@@ -85,12 +67,10 @@ sf::Vector3f worldToScreen(const sf::Vector3f & world)
 	sf::Vector3f screen = {halfSize.x, halfSize.y, 0.f};
 	screen.x += halfSize.x * proj.x;
 	screen.y += halfSize.y * proj.y;
-	screen.z  = scale * roadWidth * halfSize.x;
+	screen.z  = scale * width * halfSize.x;
 
 	return screen;
 }
-
-
 
 int main()
 {
@@ -112,51 +92,44 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	size_t n_segs = 200;
+	//std::vector<sf::Vector3f> segments(40);
+	Road bob(20, 40, 10);
+
+	auto segments = bob.generate(320);
+	//std::generate_n(std::back_inserter(segments), 800, bob);
+	
+	/*
+	size_t n_segs = 320;
 	std::vector<sf::Vector3f> segments(n_segs);
 
 	for(int i = 0; i < segments.size(); i++)
 	{
 		auto & seg = segments[i];
-		seg.y = roadHeight;
-		seg.z = i * -segmentLength+segmentLength;
-		seg.x = Curve::None;
+		seg.y = Constants::Road::MaxHeight;
+		seg.z = i * -Constants::Road::SegmentLength+Constants::Road::SegmentLength;
+		seg.x = Constants::Curve::None;
 	}
 
-	float steepHill = roadHeight + 2000.f;
+	Road::transitionHill(segments.begin() + 30, segments.begin() + 50, Road::Hill::None, Road::Hill::Steep);
+	Road::holdHill(segments.begin() + 50, segments.begin() + 70, Road::Hill::Steep);
+	Road::transitionHill(segments.begin() + 70, segments.begin() + 90, Road::Hill::Steep, Road::Hill::None);
 
-	for(int i = 30; i < 50; i++) 
-	{
-		float s = Math::normalize(30, 50, i);
-		segments[i].y = Math::easeInOut(roadHeight, steepHill, s);
-	}
-	for(int i = 50; i < 70; i++) 
-	{
-		segments[i].y = steepHill;
-	}
-	for(int i = 70; i < 90; i++) 
-	{
-		float s = Math::normalize(70, 90, i);
-		segments[i].y = Math::easeInOut(steepHill, roadHeight, s);
-	}
+	Road::enterCurve(segments.begin() + 130, segments.begin() + 150, Road::Curve::None, -Road::Curve::Medium);
+	Road::holdCurve(segments.begin() + 150, segments.begin() + 170 , -Road::Curve::Medium);
+	Road::exitCurve(segments.begin() + 170, segments.begin() + 190 , -Road::Curve::Medium, Road::Curve::None);
 
+	Road::enterCurve(segments.begin() + 200, segments.begin() + 210, Road::Curve::None, Road::Curve::Sharp);
+	Road::holdCurve(segments.begin() + 210, segments.begin() + 290 , Road::Curve::Sharp);
+	Road::exitCurve(segments.begin() + 290, segments.end() , Road::Curve::Sharp, Road::Curve::None);
 
-	for(int i = 130; i < 150; i++) 
-	{
-		float s = Math::normalize(130, 150, i);
-		segments[i].x = Math::easeIn(Curve::None, -Curve::Medium, s);
-	}
-	for(int i = 150; i < 170; i++) 
-	{
-		segments[i].x = -Curve::Medium;
-	}
-	for(int i = 170; i < 190; i++) 
-	{
-		float s = Math::normalize(170, 190, i);
-		segments[i].x = Math::easeOut(-Curve::Medium, Curve::None, s);
-	}
+	Road::transitionHill(segments.begin() + 200, segments.begin() + 220, Road::Hill::None,  Road::Hill::Steep);
+	Road::transitionHill(segments.begin() + 220, segments.begin() + 240, Road::Hill::Steep, Road::Hill::None);
+	Road::transitionHill(segments.begin() + 240, segments.begin() + 260, Road::Hill::None,  Road::Hill::Steep);
+	Road::transitionHill(segments.begin() + 260, segments.begin() + 280, Road::Hill::Steep, Road::Hill::None);
+	Road::transitionHill(segments.begin() + 280, segments.begin() + 300, Road::Hill::None,  Road::Hill::Steep);
+	Road::transitionHill(segments.begin() + 300, segments.begin() + 320, Road::Hill::Steep, Road::Hill::None);
+	*/
 	
-
 	float velocity = 0.f, maxVelocity = 200.f;
 	float turnVelocity = 40.f;
 
@@ -191,6 +164,10 @@ int main()
 		{
 			velocity = -maxVelocity;
 		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+		{
+			velocity = 500.f;
+		}
 		else velocity = 0.f;
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
@@ -222,24 +199,22 @@ int main()
 		window.clear();
 		window.draw(background);
 
-		float base = camera.z / -segmentLength;
-		float playerDepth = player.z / -segmentLength;
+		float base = camera.z / -Constants::Road::SegmentLength;
+		float playerDepth = player.z / -Constants::Road::SegmentLength;
+		float prevHeight = segments[base].y;
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
-		float dy = Math::getDecimal(base);
+		float minY = segments[base].y;
 
-		camera.y = -roadHeight + Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth));
+		camera.y = -Constants::Road::MaxHeight + Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth));
 
-		for(size_t i = base; i < segments.size() && i < base + 30; i++)
+		for(size_t i = base; i < segments.size() && i < base + 30; i++) //TODO: Remove constant
 		{
 			auto & seg = segments[i];
 			auto & seg2 = segments[i + 1];
 
-			//Behind us
-			if(seg2.z > segmentLength) continue;
-
-			auto screen1 = worldToScreen(seg);
-			auto screen2 = worldToScreen(seg2);
+			auto screen1 = worldToScreen(seg, Constants::Road::Width);
+			auto screen2 = worldToScreen(seg2, Constants::Road::Width);
 
 			screen1.x += dx;
 			screen2.x += dx + ddx;
@@ -248,10 +223,15 @@ int main()
 			ddx = seg.x;
 
 			//Too far ahead
-			if(screen2.y > 768.f || screen2.z < 60.f) continue; //TODO: Remove constant
+			if(	screen2.y > 768.f ||	//Utanför skärmens gränser
+				minY < screen2.y  ||	//Bakom en kulle
+				screen2.z < 60.f		//För smal för att renderas	
+			) continue; //TODO: Remove constant
 
 			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
+
+			if(minY > screen2.y) minY = screen2.y;
 
 			window.draw(quad);
 		}

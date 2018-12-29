@@ -1,0 +1,5 @@
+Segment chunk len >= 20
+Hill must not place camera < 0
+Start downwards
+Curve limits: -20 <= Curve <= 20
+Hill limits: roadHeight <= Hill < roadHeight + 4000
