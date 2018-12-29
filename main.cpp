@@ -92,43 +92,8 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	
-	//std::vector<sf::Vector3f> segments(40);
 	Road bob(20, 40, 10);
-
 	auto segments = bob.generate(320);
-	//std::generate_n(std::back_inserter(segments), 800, bob);
-	
-	/*
-	size_t n_segs = 320;
-	std::vector<sf::Vector3f> segments(n_segs);
-
-	for(int i = 0; i < segments.size(); i++)
-	{
-		auto & seg = segments[i];
-		seg.y = Constants::Road::MaxHeight;
-		seg.z = i * -Constants::Road::SegmentLength+Constants::Road::SegmentLength;
-		seg.x = Constants::Curve::None;
-	}
-
-	Road::transitionHill(segments.begin() + 30, segments.begin() + 50, Road::Hill::None, Road::Hill::Steep);
-	Road::holdHill(segments.begin() + 50, segments.begin() + 70, Road::Hill::Steep);
-	Road::transitionHill(segments.begin() + 70, segments.begin() + 90, Road::Hill::Steep, Road::Hill::None);
-
-	Road::enterCurve(segments.begin() + 130, segments.begin() + 150, Road::Curve::None, -Road::Curve::Medium);
-	Road::holdCurve(segments.begin() + 150, segments.begin() + 170 , -Road::Curve::Medium);
-	Road::exitCurve(segments.begin() + 170, segments.begin() + 190 , -Road::Curve::Medium, Road::Curve::None);
-
-	Road::enterCurve(segments.begin() + 200, segments.begin() + 210, Road::Curve::None, Road::Curve::Sharp);
-	Road::holdCurve(segments.begin() + 210, segments.begin() + 290 , Road::Curve::Sharp);
-	Road::exitCurve(segments.begin() + 290, segments.end() , Road::Curve::Sharp, Road::Curve::None);
-
-	Road::transitionHill(segments.begin() + 200, segments.begin() + 220, Road::Hill::None,  Road::Hill::Steep);
-	Road::transitionHill(segments.begin() + 220, segments.begin() + 240, Road::Hill::Steep, Road::Hill::None);
-	Road::transitionHill(segments.begin() + 240, segments.begin() + 260, Road::Hill::None,  Road::Hill::Steep);
-	Road::transitionHill(segments.begin() + 260, segments.begin() + 280, Road::Hill::Steep, Road::Hill::None);
-	Road::transitionHill(segments.begin() + 280, segments.begin() + 300, Road::Hill::None,  Road::Hill::Steep);
-	Road::transitionHill(segments.begin() + 300, segments.begin() + 320, Road::Hill::Steep, Road::Hill::None);
-	*/
 	
 	float velocity = 0.f, maxVelocity = 200.f;
 	float turnVelocity = 40.f;

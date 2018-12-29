@@ -19,11 +19,11 @@ Segments Road::generate(size_t length)
 	for(size_t i = 0; i < segments.size(); i++)
 	{
 		auto & segment = segments[i];
-		segment.x = Constants::Curve::None;
+		segment.x = Curve::None;
 		segment.y = Constants::Road::MaxHeight;
 
-		//Skjut fram segmentet i förhållande till dess position
-		segment.z = i * -Constants::Road::SegmentLength + Constants::Road::SegmentLength;
+		//Skjut fram segmentet djupare i förhållande till dess position
+		segment.z = Constants::Road::SegmentLength - (i * Constants::Road::SegmentLength);
 	}
 
 	Utils::transitionHill(segments.begin() + 30, segments.begin() + 50, Hill::None, Hill::Steep);
