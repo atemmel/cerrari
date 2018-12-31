@@ -36,7 +36,6 @@ template<typename ForwardIterator>
 void exitCurve(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
 	int max = static_cast<int>(std::distance(first, last) );
-	//int max = static_cast<int>(last - first);
 
 	for(int i = 0; i != max; i++)
 	{
@@ -50,7 +49,6 @@ template<typename ForwardIterator>
 void transitionHill(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
 	int max = static_cast<int>(std::distance(first, last) );
-	//int max = static_cast<int>(last - first);
 
 	for(int i = 0; i != max; i++)
 	{

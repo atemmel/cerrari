@@ -7,9 +7,9 @@
 
 const static sf::VideoMode defaultMode(1024, 768);
 
-static bool fullscreen = 0;
-
 sf::RectangleShape background(sf::Vector2f(1024.f, 768.f));
+
+static bool fullscreen = 0;
 
 float fov = 100.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
@@ -79,7 +79,7 @@ int main()
 	sf::Texture playerTexture;
 	sf::Sprite playerSprite;
 
-	background.setFillColor(sf::Color(80, 0, 200)); //TODO: Remove constant
+	background.setFillColor(sf::Color(0, 0, 0)); //TODO: Remove constant
 	window.setFramerateLimit(60u);
 	playerTexture.loadFromFile("ferrari.png");
 	playerSprite.setTexture(playerTexture);
@@ -91,8 +91,10 @@ int main()
 	}
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
+	sf::VertexArray grid(sf::PrimitiveType::Lines, 30u);
 	
-	Road bob(20, 40, 10);
+	Road bob(20, 40, 3933873847);
+	//Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(320);
 	
 	float velocity = 0.f, maxVelocity = 200.f;
@@ -171,7 +173,8 @@ int main()
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
 
-		camera.y = -Constants::Road::MaxHeight + Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth));
+		camera.y = -Constants::Road::MaxHeight + Math::interpolate(segments[playerDepth].y, 
+				segments[playerDepth + 1].y, Math::getDecimal(playerDepth) );
 
 		for(size_t i = base; i < segments.size() && i < base + 30; i++) //TODO: Remove constant
 		{

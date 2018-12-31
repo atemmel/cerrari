@@ -2,67 +2,58 @@
 #define ROAD_HPP
 
 #include "utils.hpp"
+#include "constants.hpp"
 
 #include <random>
 #include <iostream>
-
-namespace Constants
-{
-
-	namespace Road
-	{
-		constexpr float Width = 2000.f;
-		constexpr float MaxHeight = 1000.f;
-		constexpr float SegmentLength = 1600.f;
-	};
-
-	namespace Curve
-	{
-		constexpr float None = 0.f;
-		constexpr float Weak = 5.f;
-		constexpr float Medium = 10.f;
-		constexpr float Sharp = 20.f;
-	};
-
-	namespace Hill
-	{
-		constexpr float None = Road::MaxHeight;
-		constexpr float Weak = (Road::MaxHeight + 1000.f);
-		constexpr float Medium = (Road::MaxHeight + 2000.f);
-		constexpr float Steep = (Road::MaxHeight + 4000.f);
-	};
-
-};
+#include <utility>
 
 class Road
 {
 public:
 	using Distribution = std::uniform_int_distribution<unsigned>;
+	using RealDistribution = std::uniform_real_distribution<float>;
 	using Segment = sf::Vector3f;
 	using Segments = std::vector<Segment>;
+	using Iterator = Segments::iterator;
+	using Range	= std::pair<Iterator, Iterator>;
+	using Seed = std::random_device::result_type;
 
-	Road(unsigned min, unsigned max, unsigned int seed);
+	Road(unsigned min, unsigned max, Seed seed);
 
 	Segments generate(size_t length);
 
-	void seed(unsigned newSeed);
-	unsigned getSeed() const;
+	void seed(Seed newSeed);
+	Seed getSeed() const;
 
 
 private:
-	enum HillState { EnteringHill, HoldingHill, ExitingHill, N_HillState };
-	enum CurveState { EnteringCurve, HoldingCurve, ExitingCurve, N_CurveState };
+	enum HillState  { NoHill,  EnteringHill,  HoldingHill,  ExitingHill,  N_HillState  };
+	enum CurveState { NoCurve, EnteringCurve, HoldingCurve, ExitingCurve, N_CurveState };
+
+	void changeRoad(const Segments & segments, Range range);
+
+	unsigned nextHillState(HillState state);
+	unsigned nextCurveState(CurveState state);
+
+	unsigned randomChunkLength();
+	bool coinflip();
+	float randomHill();
+	float randomCurve();
 
 	std::mt19937 _gen;
 	
 	Distribution _chunkDist;
-	Distribution _hillOptions;
-	Distribution _curveOptions;
+	Distribution _coinflip;
+	RealDistribution _hillDist;
+	RealDistribution _curveDist;
 
-	float _z;
-	int _step;
 	HillState _hillState;
 	CurveState _curveState;
+
+	float _currentCurve; 
+	float _currentHill;
+
 };
 
 #endif
