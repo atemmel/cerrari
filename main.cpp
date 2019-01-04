@@ -84,10 +84,13 @@ int main()
 	
 	//Road bob(20, 40, 3933873847);
 	Road bob(20, 40, std::random_device()());
-	auto segments = bob.generate(320);
+	auto segments = bob.generate(500);
 	
-	float velocity = 0.f, maxVelocity = 200.f;
-	float turnVelocity = 40.f;
+	float velocity = 0.f, maxVelocity = 500.f;
+	float acceleration = 0.f, accPerTick = 20.f;
+	float turnVelocity = 10.f;
+	float velX = 0.f;
+	float maxX = 2.f;
 
 	while(window.isOpen())
 	{
@@ -114,26 +117,24 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
 		{
-			velocity = maxVelocity;
+			acceleration = accPerTick;
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
 		{
-			velocity = -maxVelocity;
+			acceleration = -accPerTick * 0.5f;
 		}
-		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-		{
-			velocity = 500.f;
-		}
-		else velocity = 0.f;
+		else acceleration = 12 * -velocity / maxVelocity;
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
 		{
-			camera.x -= turnVelocity;
+
+			velX = -turnVelocity;
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
 		{
-			camera.x += turnVelocity;
+			velX = turnVelocity;
 		}
+		else velX = 0.f;
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
 		{
@@ -146,8 +147,16 @@ int main()
 
 		//---------//
 
+		velocity += acceleration;
+		velocity = std::clamp(velocity, 0.f, maxVelocity);
+		velX = Math::normalize(0.f, maxVelocity, velocity) * velX;
+
+		camera.x += velX;
+		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
+		if(fabs(camera.x) > Constants::Road::Width * 0.5f) velocity *= 0.92f;
 		camera.z -= velocity;
 		player.z -= velocity;
+
 		
 		//---------//
 
@@ -161,6 +170,7 @@ int main()
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
+		camera.x = camera.x - (1.5f * segments[base].x);
 
 		camera.y =  Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
 			- Constants::Road::MaxHeight;
@@ -190,11 +200,11 @@ int main()
 
 			if(minY > screen2.y) minY = screen2.y;
 
-			if(i % 4 == 0)
-			{
-				line[0].position.y = line[1].position.y = screen1.y;
+			//if(i % 2 == 0)
+			//{
+				//line[0].position.y = line[1].position.y = screen1.y;
 				//window.draw(line);
-			}
+			//}
 
 			window.draw(quad);
 		}

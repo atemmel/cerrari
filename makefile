@@ -4,7 +4,7 @@ LIBS=-lsfml-system -lsfml-graphics -lsfml-window
 SRC=*.cpp
 
 $(TARGET): $(SRC) 
-	g++ $(LIBS) -o $(TARGET) $(SRC)
+	g++ $(LIBS) -o $(TARGET) $(SRC) -std=c++17
 
 test: $(TARGET)
 	./$(TARGET)
