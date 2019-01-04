@@ -3,8 +3,9 @@
 
 #include "math.hpp"
 
+#include <SFML/Graphics/VertexArray.hpp>
+
 #include <algorithm>
-#include <cassert>
 
 namespace Utils
 {
@@ -13,7 +14,6 @@ template<typename ForwardIterator>
 void enterCurve(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
 	int max = static_cast<int>(std::distance(first, last) );
-	//int max = static_cast<int>(last - first);
 
 	for(int i = 0; i != max; i++)
 	{
@@ -66,6 +66,9 @@ void holdHill(ForwardIterator first, ForwardIterator last, float hold)
 		vector.y = hold;
 	});
 }
+
+void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
+		sf::Vector2f far, float farWidth, sf::Color color);
 
 };
 

@@ -16,20 +16,6 @@ sf::Vector3f camera	= {0.f, 0.f, 1000.f};
 sf::Vector3f player = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
 
 
-void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
-		sf::Vector2f far, float farWidth, sf::Color color)
-{
-	const sf::Vector2f halfNearWidth	= {nearWidth	* 0.5f, 0.f};
-	const sf::Vector2f halfFarWidth		= {farWidth		* 0.5f, 0.f};
-
-	arr[0].position = sf::Vector2f(near - halfNearWidth);
-	arr[1].position = sf::Vector2f(near + halfNearWidth);
-	arr[2].position = sf::Vector2f(far + halfFarWidth);
-	arr[3].position = sf::Vector2f(far - halfFarWidth);
-
-	for(int i = 0; i < 4; i++) arr[i].color = color;
-}
-
 sf::Vector3f worldToScreen(const sf::Vector3f & world, float width)
 {
 	// h = camera height
@@ -92,9 +78,12 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
 	sf::VertexArray grid(sf::PrimitiveType::Lines, 30u);
+	sf::VertexArray line(sf::PrimitiveType::Lines, 2u);
+	line[0].color = line[1].color = sf::Color::Magenta;
+	line[1].position.x = 1024;
 	
-	Road bob(20, 40, 3933873847);
-	//Road bob(20, 40, std::random_device()());
+	//Road bob(20, 40, 3933873847);
+	Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(320);
 	
 	float velocity = 0.f, maxVelocity = 200.f;
@@ -155,12 +144,12 @@ int main()
 			fov += 0.01;
 		}
 
-		//---------
+		//---------//
 
 		camera.z -= velocity;
 		player.z -= velocity;
 		
-		//---------
+		//---------//
 
 		window.setView(view);
 		window.clear();
@@ -173,8 +162,8 @@ int main()
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
 
-		camera.y = -Constants::Road::MaxHeight + Math::interpolate(segments[playerDepth].y, 
-				segments[playerDepth + 1].y, Math::getDecimal(playerDepth) );
+		camera.y =  Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
+			- Constants::Road::MaxHeight;
 
 		for(size_t i = base; i < segments.size() && i < base + 30; i++) //TODO: Remove constant
 		{
@@ -196,10 +185,16 @@ int main()
 				screen2.z < 60.f		//För smal för att renderas	
 			) continue; //TODO: Remove constant
 
-			moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
+			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
 
 			if(minY > screen2.y) minY = screen2.y;
+
+			if(i % 4 == 0)
+			{
+				line[0].position.y = line[1].position.y = screen1.y;
+				//window.draw(line);
+			}
 
 			window.draw(quad);
 		}
