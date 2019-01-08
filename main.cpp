@@ -174,7 +174,7 @@ int main()
 		window.draw(background);
 
 		float base = camera.z / -Constants::Road::SegmentLength;
-		float playerDepth = playerS.position.z / -Constants::Road::SegmentLength;
+		float playerDepth = player.position.z / -Constants::Road::SegmentLength;
 		float prevHeight = segments[base].y;
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
@@ -219,9 +219,9 @@ int main()
 		}
 
 		//auto v = worldToScreen(player, 0.f);
-		playerS.sprite.setPosition( (WindowX - playerS.sprite.getGlobalBounds().width) * 0.5f, WindowY - playerS.sprite.getGlobalBounds().height);
+		player.sprite.setPosition( (WindowX - player.sprite.getGlobalBounds().width) * 0.5f, WindowY - player.sprite.getGlobalBounds().height);
 
-		window.draw(playerS.sprite);
+		window.draw(player.sprite);
 
 		window.display();
 	}
