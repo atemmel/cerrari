@@ -5,6 +5,8 @@ struct Player
 {
 	void update()
 	{
+		//if(fabs(velocity.y - 20.f) < 0.f) velocity.y = 0.f;
+		//if(fabs(velocity.x - 20.f) < 0.f) velocity.x = 0.f;
 		position += velocity;
 
 		sf::IntRect rect;

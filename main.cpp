@@ -86,7 +86,7 @@ int main()
 	sf::VertexArray grid(sf::PrimitiveType::Lines, 30u);
 	sf::VertexArray line(sf::PrimitiveType::Lines, 2u);
 	line[0].color = line[1].color = sf::Color::Magenta;
-	line[1].position.x = 1024;
+	line[1].position.x = WindowX;
 	
 	//Road bob(20, 40, 3933873847);
 	Road bob(20, 40, std::random_device()());
@@ -131,6 +131,7 @@ int main()
 		}
 		else acceleration = 12 * -velocity / maxVelocity;
 
+		player.velocity.x = 0.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
 		{
 			player.velocity.x = -turnVelocity;
@@ -138,10 +139,6 @@ int main()
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
 		{
 			player.velocity.x = turnVelocity;
-		}
-		else 
-		{
-			player.velocity.x = 0.f;
 		}
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
@@ -157,7 +154,7 @@ int main()
 
 		velocity += acceleration;
 		velocity = std::clamp(velocity, 0.f, maxVelocity);
-		player.velocity.x *= Math::normalize(0.f, maxVelocity, velocity);
+		player.velocity.x *= Math::easeOut(0.f, 1.f, velocity / maxVelocity);
 
 		camera.x += player.velocity.x;
 		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
@@ -165,7 +162,6 @@ int main()
 		camera.z -= velocity;
 		player.position.z -= velocity;
 		player.update();
-
 		
 		//---------//
 
@@ -179,7 +175,7 @@ int main()
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
-		camera.x = camera.x - (1.5f * segments[base].x);
+		camera.x = camera.x - (1.5f * segments[base].x) * velocity/maxVelocity;
 
 		camera.y =  Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
 			- Constants::Road::MaxHeight;
@@ -204,21 +200,20 @@ int main()
 				screen2.z < WindowX / 60.f		//För smal för att renderas	
 			) continue; //TODO: Remove constant
 
+			if(i % 2 == 0)
+			{
+				line[0].position.y = line[1].position.y = screen1.y;
+				window.draw(line);
+			}
+
 			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
 
 			if(minY > screen2.y) minY = screen2.y;
 
-			//if(i % 2 == 0)
-			//{
-				//line[0].position.y = line[1].position.y = screen1.y;
-				//window.draw(line);
-			//}
-
 			window.draw(quad);
 		}
 
-		//auto v = worldToScreen(player, 0.f);
 		player.sprite.setPosition( (WindowX - player.sprite.getGlobalBounds().width) * 0.5f, WindowY - player.sprite.getGlobalBounds().height);
 
 		window.draw(player.sprite);
