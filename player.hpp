@@ -44,7 +44,7 @@ struct Player
 
 	void brake()
 	{
-
+		acceleration = -accPerTick * 0.5f;
 	}
 
 	void turn(Direction direction)

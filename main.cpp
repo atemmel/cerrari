@@ -118,7 +118,7 @@ int main()
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
 		{
-			player.acceleration = -player.accPerTick * 0.5f;
+			player.brake();
 		}
 		else player.acceleration = 12 * -velocity / maxVelocity;
 
