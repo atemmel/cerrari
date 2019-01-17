@@ -86,7 +86,6 @@ int main()
 	auto segments = bob.generate(8000);
 	
 	float velocity = 0.f, maxVelocity = 500.f;
-	float acceleration = 0.f, accPerTick = 20.f;
 	float turnVelocity = 16.f;
 	float maxX = 2.f;
 
@@ -115,13 +114,13 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
 		{
-			acceleration = accPerTick;
+			player.accelerate();
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
 		{
-			acceleration = -accPerTick * 0.5f;
+			player.acceleration = -player.accPerTick * 0.5f;
 		}
-		else acceleration = 12 * -velocity / maxVelocity;
+		else player.acceleration = 12 * -velocity / maxVelocity;
 
 		player.velocity.x = 0.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
@@ -146,7 +145,7 @@ int main()
 
 		//---------//
 
-		velocity += acceleration;
+		velocity += player.acceleration;
 		velocity = std::clamp(velocity, 0.f, maxVelocity);
 		player.velocity.x *= Math::easeOut(0.f, 1.f, velocity / maxVelocity);
 

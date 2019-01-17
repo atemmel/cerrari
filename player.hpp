@@ -34,7 +34,7 @@ struct Player
 
 	void accelerate()
 	{
-		
+		acceleration = accPerTick;
 	}
 
 	void deaccelerate()
@@ -55,6 +55,9 @@ struct Player
 	sf::Sprite sprite;
 	sf::Vector3f position;
 	sf::Vector3f velocity;
+	//sf::Vector3f acceleration;
+
+	float acceleration = 0.f, accPerTick = 20.f;
 
 	const sf::Vector2i spriteDim {63, 35};
 	const sf::Vector2i spriteNormalPos {144, 12};
