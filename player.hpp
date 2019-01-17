@@ -3,6 +3,8 @@
 
 struct Player
 {
+	enum Direction { Left, Right};
+
 	void update()
 	{
 		//if(fabs(velocity.y - 80.f) < 0.f) velocity.y = 0.f;
@@ -28,6 +30,26 @@ struct Player
 		}
 
 		sprite.setTextureRect(rect);
+	}
+
+	void accelerate()
+	{
+		
+	}
+
+	void deaccelerate()
+	{
+
+	}
+
+	void brake()
+	{
+
+	}
+
+	void turn(Direction direction)
+	{
+
 	}
 
 	sf::Sprite sprite;

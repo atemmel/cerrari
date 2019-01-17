@@ -88,7 +88,6 @@ int main()
 	float velocity = 0.f, maxVelocity = 500.f;
 	float acceleration = 0.f, accPerTick = 20.f;
 	float turnVelocity = 16.f;
-	//float velX = 0.f;
 	float maxX = 2.f;
 
 	while(window.isOpen())
@@ -134,6 +133,7 @@ int main()
 			player.velocity.x = turnVelocity;
 		}
 
+		/*
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
 		{
 			fov -= 0.01;
@@ -142,6 +142,7 @@ int main()
 		{
 			fov += 0.01;
 		}
+		*/
 
 		//---------//
 
@@ -149,12 +150,12 @@ int main()
 		velocity = std::clamp(velocity, 0.f, maxVelocity);
 		player.velocity.x *= Math::easeOut(0.f, 1.f, velocity / maxVelocity);
 
-		camera.x += player.velocity.x;
-		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
-		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) velocity *= 0.92f;
 		player.velocity.z = -velocity;
 		player.update();
 		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
+		camera.x = player.position.x;
+		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
+		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) velocity *= 0.92f;
 		
 		//---------//
 
