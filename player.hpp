@@ -46,7 +46,7 @@ struct Player
 
 	void deaccelerate()
 	{
-
+		acceleration = 12 * velocity.z / maxVelocity;
 	}
 
 	void brake()

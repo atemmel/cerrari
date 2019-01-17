@@ -119,7 +119,8 @@ int main()
 		{
 			player.brake();
 		}
-		else player.acceleration = 12 * -player.velocity.z / player.maxVelocity;
+		else player.deaccelerate();
+		//else player.acceleration = 12 * player.velocity.z / player.maxVelocity;
 
 		player.velocity.x = 0.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
