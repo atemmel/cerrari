@@ -7,12 +7,9 @@
 #include <vector>
 #include <algorithm>
 
-static constexpr int WindowX = 1280;
-static constexpr int WindowY = 720;
+const static sf::VideoMode defaultMode(Constants::window.x, Constants::window.y);
 
-const static sf::VideoMode defaultMode(WindowX, WindowY);
-
-sf::RectangleShape background(sf::Vector2f(WindowX, WindowY) );
+sf::RectangleShape background(sf::Vector2f(Constants::window.x, Constants::window.y) );
 
 static bool fullscreen = 0;
 
@@ -84,9 +81,9 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 12u);
 	
-	Road bob(20, 40, 1800098824);
-	//Road bob(20, 40, std::random_device()());
-	auto segments = bob.generate(1000);
+	//Road bob(20, 40, 1800098824);
+	Road bob(20, 40, std::random_device()());
+	auto segments = bob.generate(8000);
 	
 	float velocity = 0.f, maxVelocity = 500.f;
 	float acceleration = 0.f, accPerTick = 20.f;
@@ -171,8 +168,8 @@ int main()
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
-		camera.x = camera.x - (1.5f * segments[base].x) * velocity/maxVelocity;
 
+		camera.x = camera.x - (1.5f * segments[base].x) * velocity/maxVelocity;
 		camera.y = Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
 			- Constants::Road::MaxHeight;
 
@@ -191,30 +188,23 @@ int main()
 			ddx = seg.x;
 
 			//Too far ahead
-			if(	screen2.y > WindowY 		||	//Utanför skärmens gränser
-				minY < screen2.y  			||	//Bakom en kulle
-				screen2.z < WindowX / 60.f		//För smal för att renderas	
-			) continue; 						//TODO: Remove constant
+			if(	screen2.y > Constants::window.y 		||	//Utanför skärmens gränser
+				minY < screen2.y  						||	//Bakom en kulle
+				screen2.z < Constants::window.x / 60.f		//För smal för att renderas	
+			) continue; 									//TODO: Remove constant
 
 			if(minY > screen2.y) minY = screen2.y;
 
-			//if(i % 2 == 0)
-			//{
-				//line[0].position.y = line[1].position.y = screen1.y;
-				//window.draw(line);
-			//}
-
 			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
-					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
-					i % 2 == 0 ? sf::Color(120, 0, 120) : sf::Color(50, 0, 200) ); //TODO: Remove constant
-
-			window.draw(quad);
+					0 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
+					i % 2 == 0 ? sf::Color(120, 0, 120) : sf::Color(50, 0, 200) 
+			); //TODO: Remove constant
 
 			window.draw(quad);
 		}
 
-		player.sprite.setPosition( (WindowX - player.sprite.getGlobalBounds().width) * 0.5f, 
-				WindowY - player.sprite.getGlobalBounds().height + sinf(player.position.z * 0.5f) );
+		player.sprite.setPosition( (Constants::window.x - player.sprite.getGlobalBounds().width) * 0.5f, 
+				Constants::window.y - player.sprite.getGlobalBounds().height + sinf(player.position.z * 0.5f) );
 
 		window.draw(player.sprite);
 

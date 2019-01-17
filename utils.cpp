@@ -16,12 +16,12 @@ void Utils::moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth,
 	arr[6].position = sf::Vector2f(far + halfFarWidth);
 	arr[7].position = sf::Vector2f(far - halfFarWidth);
 
-	arr[8].position = sf::Vector2f(near.x, near.y);
-	arr[9].position = sf::Vector2f(Constants::window.x, near.y);
-	arr[10].position = sf::Vector2f(Constants::window.x, far.y);
-	arr[11].position = sf::Vector2f(far.x, far.y);
+	arr[8].position = sf::Vector2f(far.x + halfFarWidth.x, far.y);
+	arr[9].position = sf::Vector2f(near.x + halfNearWidth.x, near.y);
+	arr[10].position = sf::Vector2f(Constants::window.x, near.y);
+	arr[11].position = sf::Vector2f(Constants::window.x, far.y);
 
-	for(int i = 0; i < 4;  i++) arr[i].color = offroadColor;
-	for(int i = 4; i < 8;  i++) arr[i].color = roadColor;
+	for(int i = 0; i < 4 ; i++) arr[i].color = offroadColor;
+	for(int i = 4; i < 8 ; i++) arr[i].color = roadColor;
 	for(int i = 8; i < 12; i++) arr[i].color = offroadColor;
 }
