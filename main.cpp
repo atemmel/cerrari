@@ -148,7 +148,6 @@ int main()
 		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 		camera.x = player.position.x;
 		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
-		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) player.velocity.z *= 0.92f;
 		
 		//---------//
 

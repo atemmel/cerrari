@@ -11,7 +11,9 @@ struct Player
 		_calcVelocity = std::clamp(_calcVelocity, 0.f, maxVelocity);
 		velocity.x *= Math::easeOut(0.f, 1.f, _calcVelocity / maxVelocity);
 
+		if(fabs(position.x) > (Constants::Road::Width - sprite.getGlobalBounds().width) * 0.5f) _calcVelocity *= 0.92f;
 		velocity.z = -_calcVelocity;
+
 		//if(fabs(velocity.y - 80.f) < 0.f) velocity.y = 0.f;
 		if(fabs(velocity.z) - 5.f < 0.f) velocity.z = 0.f;
 		position += velocity;
