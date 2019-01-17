@@ -11,8 +11,6 @@ const static sf::VideoMode defaultMode(Constants::window.x, Constants::window.y)
 
 sf::RectangleShape background(sf::Vector2f(Constants::window.x, Constants::window.y) );
 
-static bool fullscreen = 0;
-
 float fov = 100.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
 
@@ -81,13 +79,9 @@ int main()
 
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 12u);
 	
-	//Road bob(20, 40, 1800098824);
 	Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(8000);
 	
-	float turnVelocity = 16.f;
-	float maxX = 2.f;
-
 	while(window.isOpen())
 	{
 		sf::Event event;
@@ -120,16 +114,14 @@ int main()
 			player.brake();
 		}
 		else player.deaccelerate();
-		//else player.acceleration = 12 * player.velocity.z / player.maxVelocity;
 
-		player.velocity.x = 0.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
 		{
-			player.velocity.x = -turnVelocity;
+			player.turn(Player::Direction::Left);
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
 		{
-			player.velocity.x = turnVelocity;
+			player.turn(Player::Direction::Right);
 		}
 
 		//---------//
@@ -178,8 +170,8 @@ int main()
 			if(minY > screen2.y) minY = screen2.y;
 
 			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
-					0 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
-					i % 2 == 0 ? sf::Color(120, 0, 120) : sf::Color(50, 0, 200) 
+					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
+					i % 2 == 0 ? sf::Color(80, 200, 80) : sf::Color(50, 0, 200) 
 			); //TODO: Remove constant
 
 			window.draw(quad);

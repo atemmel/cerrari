@@ -37,6 +37,7 @@ struct Player
 		}
 
 		sprite.setTextureRect(rect);
+		velocity.x = 0.f;
 	}
 
 	void accelerate()
@@ -56,13 +57,20 @@ struct Player
 
 	void turn(Direction direction)
 	{
-
+		switch (direction)
+		{
+			case Direction::Left:
+				velocity.x -= turnVelocity;
+				break;
+			case Direction::Right:
+				velocity.x += turnVelocity;
+				break;
+		}
 	}
 
 	sf::Sprite sprite;
 	sf::Vector3f position;
 	sf::Vector3f velocity;
-	//sf::Vector3f acceleration;
 
 	float acceleration = 0.f, accPerTick = 20.f;
 	constexpr static float maxVelocity = 500.f;
@@ -73,6 +81,7 @@ struct Player
 	const sf::Vector2i spriteLeftPos {0, 12};
 private:
 	float _calcVelocity = 0.f;
+	float turnVelocity = 16.f;
 };
 
 #endif
