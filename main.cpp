@@ -85,7 +85,6 @@ int main()
 	Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(8000);
 	
-	float velocity = 0.f, maxVelocity = 500.f;
 	float turnVelocity = 16.f;
 	float maxX = 2.f;
 
@@ -120,7 +119,7 @@ int main()
 		{
 			player.brake();
 		}
-		else player.acceleration = 12 * -velocity / maxVelocity;
+		else player.acceleration = 12 * -player.velocity.z / player.maxVelocity;
 
 		player.velocity.x = 0.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
@@ -145,16 +144,11 @@ int main()
 
 		//---------//
 
-		velocity += player.acceleration;
-		velocity = std::clamp(velocity, 0.f, maxVelocity);
-		player.velocity.x *= Math::easeOut(0.f, 1.f, velocity / maxVelocity);
-
-		player.velocity.z = -velocity;
 		player.update();
 		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 		camera.x = player.position.x;
 		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
-		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) velocity *= 0.92f;
+		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) player.velocity.z *= 0.92f;
 		
 		//---------//
 
@@ -169,7 +163,7 @@ int main()
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
 
-		camera.x = camera.x - (1.5f * segments[base].x) * velocity/maxVelocity;
+		camera.x = camera.x - (1.5f * segments[base].x) * player.velocity.z/-player.maxVelocity;
 		camera.y = Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
 			- Constants::Road::MaxHeight;
 
