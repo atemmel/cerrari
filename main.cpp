@@ -131,23 +131,11 @@ int main()
 			player.velocity.x = turnVelocity;
 		}
 
-		/*
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
-		{
-			fov -= 0.01;
-		}
-		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-		{
-			fov += 0.01;
-		}
-		*/
-
 		//---------//
 
 		player.update();
 		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 		camera.x = player.position.x;
-		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
 		
 		//---------//
 

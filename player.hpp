@@ -14,9 +14,9 @@ struct Player
 		if(fabs(position.x) > (Constants::Road::Width - sprite.getGlobalBounds().width) * 0.5f) _calcVelocity *= 0.92f;
 		velocity.z = -_calcVelocity;
 
-		//if(fabs(velocity.y - 80.f) < 0.f) velocity.y = 0.f;
 		if(fabs(velocity.z) - 5.f < 0.f) velocity.z = 0.f;
 		position += velocity;
+		position.x = std::clamp(position.x, -Constants::Road::Width, Constants::Road::Width);
 
 		sf::IntRect rect = sf::IntRect(spriteNormalPos, spriteDim);
 
