@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#include <SFML/System/Vector2.hpp>
+
 namespace Constants
 {
 
@@ -27,6 +29,7 @@ namespace Constants
 		constexpr float Steep = (Road::MaxHeight + 4000.f);
 	};
 
+	const sf::Vector2f window = {1280.f, 720.f};
 };
 
 

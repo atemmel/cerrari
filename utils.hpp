@@ -2,6 +2,7 @@
 #define UTILS_HPP
 
 #include "math.hpp"
+#include "constants.hpp"
 
 #include <SFML/Graphics/VertexArray.hpp>
 
@@ -68,7 +69,7 @@ void holdHill(ForwardIterator first, ForwardIterator last, float hold)
 }
 
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
-		sf::Vector2f far, float farWidth, sf::Color color);
+		sf::Vector2f far, float farWidth, sf::Color roadColor, sf::Color offroadColor);
 
 };
 

@@ -73,7 +73,7 @@ int main()
 	playerTexture.loadFromFile("ferrari.png");
 	player.sprite.setTexture(playerTexture);
 	player.sprite.setTextureRect(sf::IntRect(player.spriteNormalPos, player.spriteDim) );
-	player.sprite.setScale(4.f, 4.f);
+	player.sprite.setScale(3.f, 3.f);
 	player.position = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
 
 	{
@@ -82,14 +82,10 @@ int main()
 		view.setCenter(size / 2.f);
 	}
 
-	sf::VertexArray quad(sf::PrimitiveType::Quads, 4u);
-	sf::VertexArray grid(sf::PrimitiveType::Lines, 30u);
-	sf::VertexArray line(sf::PrimitiveType::Lines, 2u);
-	line[0].color = line[1].color = sf::Color::Magenta;
-	line[1].position.x = WindowX;
+	sf::VertexArray quad(sf::PrimitiveType::Quads, 12u);
 	
-	//Road bob(20, 40, 3933873847);
-	Road bob(20, 40, std::random_device()());
+	Road bob(20, 40, 1800098824);
+	//Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(1000);
 	
 	float velocity = 0.f, maxVelocity = 500.f;
@@ -159,9 +155,9 @@ int main()
 		camera.x += player.velocity.x;
 		camera.x = std::clamp(camera.x, -Constants::Road::Width, Constants::Road::Width);
 		if(fabs(camera.x) > (Constants::Road::Width - player.sprite.getGlobalBounds().width) * 0.5f) velocity *= 0.92f;
-		camera.z -= velocity;
-		player.position.z -= velocity;
+		player.velocity.z = -velocity;
 		player.update();
+		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 		
 		//---------//
 
@@ -177,7 +173,7 @@ int main()
 		float minY = segments[base].y;
 		camera.x = camera.x - (1.5f * segments[base].x) * velocity/maxVelocity;
 
-		camera.y =  Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
+		camera.y = Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
 			- Constants::Road::MaxHeight;
 
 		for(size_t i = base; i < segments.size() && i < base + 30; i++) //TODO: Remove constant
@@ -195,26 +191,30 @@ int main()
 			ddx = seg.x;
 
 			//Too far ahead
-			if(	screen2.y > WindowY ||	//Utanför skärmens gränser
-				minY < screen2.y  ||	//Bakom en kulle
+			if(	screen2.y > WindowY 		||	//Utanför skärmens gränser
+				minY < screen2.y  			||	//Bakom en kulle
 				screen2.z < WindowX / 60.f		//För smal för att renderas	
-			) continue; //TODO: Remove constant
-
-			if(i % 2 == 0)
-			{
-				line[0].position.y = line[1].position.y = screen1.y;
-				window.draw(line);
-			}
-
-			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
-					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120)); //TODO: Remove constant
+			) continue; 						//TODO: Remove constant
 
 			if(minY > screen2.y) minY = screen2.y;
+
+			//if(i % 2 == 0)
+			//{
+				//line[0].position.y = line[1].position.y = screen1.y;
+				//window.draw(line);
+			//}
+
+			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
+					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
+					i % 2 == 0 ? sf::Color(120, 0, 120) : sf::Color(50, 0, 200) ); //TODO: Remove constant
+
+			window.draw(quad);
 
 			window.draw(quad);
 		}
 
-		player.sprite.setPosition( (WindowX - player.sprite.getGlobalBounds().width) * 0.5f, WindowY - player.sprite.getGlobalBounds().height);
+		player.sprite.setPosition( (WindowX - player.sprite.getGlobalBounds().width) * 0.5f, 
+				WindowY - player.sprite.getGlobalBounds().height + sinf(player.position.z * 0.5f) );
 
 		window.draw(player.sprite);
 

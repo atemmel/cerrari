@@ -5,23 +5,26 @@ struct Player
 {
 	void update()
 	{
-		//if(fabs(velocity.y - 20.f) < 0.f) velocity.y = 0.f;
-		//if(fabs(velocity.x - 20.f) < 0.f) velocity.x = 0.f;
+		//if(fabs(velocity.y - 80.f) < 0.f) velocity.y = 0.f;
+		if(fabs(velocity.z) - 5.f < 0.f) velocity.z = 0.f;
 		position += velocity;
 
-		sf::IntRect rect;
+		sf::IntRect rect = sf::IntRect(spriteNormalPos, spriteDim);
 
-		if(velocity.x > 0.f)
+		if(velocity.z != 0.f)
 		{
-			rect = sf::IntRect(spriteLeftPos + sf::Vector2i(spriteLeftDim.x, 0.f), sf::Vector2i(-spriteLeftDim.x, spriteLeftDim.y));
-		}
-		else if(velocity.x < 0.f)
-		{
-			rect = sf::IntRect(spriteLeftPos, spriteLeftDim);
-		}
-		else
-		{
-			rect = sf::IntRect(spriteNormalPos, spriteDim);
+			if(velocity.x > 0.f)
+			{
+				rect = sf::IntRect(spriteLeftPos + sf::Vector2i(spriteLeftDim.x, 0.f), sf::Vector2i(-spriteLeftDim.x, spriteLeftDim.y));
+			}
+			else if(velocity.x < 0.f)
+			{
+				rect = sf::IntRect(spriteLeftPos, spriteLeftDim);
+			}
+			else
+			{
+				rect = sf::IntRect(spriteNormalPos, spriteDim);
+			}
 		}
 
 		sprite.setTextureRect(rect);
