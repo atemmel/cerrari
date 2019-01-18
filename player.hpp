@@ -22,6 +22,7 @@ struct Player
 	sf::Sprite sprite;
 	sf::Vector3f position;
 	sf::Vector3f velocity;
+	float acceleration = 0.f;
 
 	constexpr static float maxVelocity = 500.f;
 
@@ -30,7 +31,7 @@ struct Player
 	const sf::Vector2i spriteLeftDim {63,35};
 	const sf::Vector2i spriteLeftPos {0, 12};
 private:
-	float acceleration = 0.f, accPerTick = 20.f;
+	constexpr static float accPerTick = 20.f;
 	float calcVelocity = 0.f;
 	float turnVelocity = 16.f;
 };

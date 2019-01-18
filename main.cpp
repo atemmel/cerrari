@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include "road.hpp"
 #include "player.hpp"
@@ -9,10 +10,8 @@
 
 const static sf::VideoMode defaultMode(Constants::window.x, Constants::window.y);
 
-sf::RectangleShape background(sf::Vector2f(Constants::window.x, Constants::window.y) );
-
-float fov = 100.f;
 sf::Vector3f camera	= {0.f, 0.f, 1000.f};
+constexpr static float fov = 100.f;
 
 sf::Vector3f worldToScreen(const sf::Vector3f & world, float width)
 {
@@ -47,7 +46,7 @@ sf::Vector3f worldToScreen(const sf::Vector3f & world, float width)
 	const float scale = d / outCamera.z;
 
 	const sf::Vector2f proj(outCamera.x * scale, outCamera.y * scale);
-	const sf::Vector2f halfSize = background.getSize() * 0.5f;
+	const sf::Vector2f halfSize = Constants::window * 0.5f;
 	sf::Vector3f screen = {halfSize.x, halfSize.y, 0.f};
 	screen.x += halfSize.x * proj.x;
 	screen.y += halfSize.y * proj.y;
@@ -60,24 +59,47 @@ int main()
 {
 	sf::RenderWindow window(defaultMode, "");
 	sf::View view(window.getView());
-	sf::Texture playerTexture;
+	sf::Texture playerTexture, bgTexture;
 	Player player;
+	sf::Sprite background;
 
-	background.setFillColor(sf::Color(0, 0, 0)); //TODO: Remove constant
+	bgTexture.loadFromFile("bg.png");
+	bgTexture.setRepeated(true);
+	background.setTexture(bgTexture);
+	background.setScale(1.2f, 1.2f);
+	
+	//background.setFillColor(sf::Color(0, 0, 100)); //TODO: Remove constant
 	window.setFramerateLimit(60u);
 	playerTexture.loadFromFile("ferrari.png");
 	player.sprite.setTexture(playerTexture);
 	player.sprite.setTextureRect(sf::IntRect(player.spriteNormalPos, player.spriteDim) );
-	player.sprite.setScale(3.f, 3.f);
+	player.sprite.setScale(4.f, 4.f);
 	player.position = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
 
 	{
-		auto size = background.getSize();
+		auto size = Constants::window;
 		view.setSize(size);
 		view.setCenter(size / 2.f);
+
+		auto texRect = background.getTextureRect();
+		texRect.top = 80.f;
+		background.setTextureRect(texRect);
 	}
 
+	sf::SoundBuffer brrrBuffer;
+	brrrBuffer.loadFromFile("brrr.ogg");
+	sf::Sound brrr;
+	brrr.setBuffer(brrrBuffer);
+	brrr.setLoop(true);
+	brrr.setVolume(10.f);
+
+	sf::Music africa;
+	africa.openFromFile("africa.ogg");
+	africa.setVolume(30.f);
+	africa.play();
+
 	sf::VertexArray quad(sf::PrimitiveType::Quads, 12u);
+		window.setView(view);
 	
 	Road bob(20, 40, std::random_device()());
 	auto segments = bob.generate(8000);
@@ -127,14 +149,16 @@ int main()
 		//---------//
 
 		player.update();
+
+		if(player.acceleration > 0.f && brrr.getStatus() != sf::Sound::Status::Playing) brrr.play();
+		else if(player.acceleration <= 0.f) brrr.stop();
+
 		camera.z = player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 		camera.x = player.position.x;
-		
+
 		//---------//
 
-		window.setView(view);
 		window.clear();
-		window.draw(background);
 
 		float base = camera.z / -Constants::Road::SegmentLength;
 		float playerDepth = player.position.z / -Constants::Road::SegmentLength;
@@ -142,6 +166,13 @@ int main()
 		float ddx = segments[base].x;
 		float dx = Math::getDecimal(base) * -ddx;
 		float minY = segments[base].y;
+
+		window.draw(background);
+
+		auto rect = background.getTextureRect();
+		rect.left = camera.x * 0.1f;
+		rect.top = minY * 0.1f;
+		background.setTextureRect(rect);
 
 		camera.x = camera.x - (1.5f * segments[base].x) * player.velocity.z/-player.maxVelocity;
 		camera.y = Math::interpolate(segments[playerDepth].y, segments[playerDepth + 1].y, Math::getDecimal(playerDepth) ) 
@@ -171,7 +202,8 @@ int main()
 
 			Utils::moveQuad(quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 					i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
-					i % 2 == 0 ? sf::Color(80, 200, 80) : sf::Color(50, 0, 200) 
+					////i % 2 == 0 ? sf::Color(80, 200, 80) : sf::Color(50, 0, 200) 
+					i % 2 == 0 ? sf::Color(87 + 40, 66 + 40, 25) : sf::Color(63, 49, 15)
 			); //TODO: Remove constant
 
 			window.draw(quad);

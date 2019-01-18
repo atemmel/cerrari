@@ -22,6 +22,7 @@ float getDecimal(float a);
 
 float normalize(float min, float max, float value);
 
+
 };
 
 #endif
