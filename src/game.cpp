@@ -8,7 +8,7 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 	m_resources.loadFromFile<MyTexture>("resources/ferrari.png");
 	m_resources.loadFromFile<MySoundBuffer>("resources/brrr.ogg");
 
-	m_africa.openFromFile("resources/africa.ogg");
+	m_africa.openFromFile("resources/music/africa.ogg");
 	m_resources.access<MyTexture>("resources/bg.png")->setRepeated(true);
 
 	m_text.setFont(*m_resources.access<MyFont>("resources/font.ttf") );
