@@ -59,6 +59,10 @@ private:
 	sf::SoundBuffer m_brrrBuffer;
 	sf::Sound m_brrr;
 	sf::Music m_africa;
+	sf::Font m_font;
+	sf::Text m_text;
+	sf::Clock m_clock;
+
 	Road m_road;
 	Road::Segments m_segments;
 	Player m_player;

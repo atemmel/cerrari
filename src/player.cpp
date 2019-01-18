@@ -50,6 +50,11 @@ void Player::brake()
 	acceleration = -accPerTick * 0.5f;
 }
 
+void Player::stop()
+{
+	acceleration = velocity.z = calcVelocity = velocity.x = 0.f;
+}
+
 void Player::turn(Player::Direction direction)
 {
 	switch (direction)

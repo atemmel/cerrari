@@ -6,11 +6,17 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed)
 	m_bgTexture.loadFromFile("resources/bg.png");
 	m_playerTexture.loadFromFile("resources/ferrari.png");
 	m_brrrBuffer.loadFromFile("resources/brrr.ogg");
+	m_font.loadFromFile("resources/font.ttf");
 	m_africa.openFromFile("resources/africa.ogg");
 
 	m_bgTexture.setRepeated(true);
 	m_background.setTexture(m_bgTexture);
 	m_background.setScale(1.2f, 1.2f);
+	m_text.setFont(m_font);
+	m_text.setCharacterSize(80);
+	m_text.setOutlineColor(sf::Color::Black);
+	m_text.setOutlineThickness(5u);
+	m_text.setPosition(100.f, 100.f);
 		
 	m_player.sprite.setTexture(m_playerTexture);
 	m_player.sprite.setTextureRect(sf::IntRect(m_player.spriteNormalPos, m_player.spriteDim) );
@@ -55,6 +61,7 @@ void Game::readInputs()
 			case sf::Event::KeyPressed:
 				switch(event.key.code)
 				{
+					case sf::Keyboard::Key::Escape:
 					case sf::Keyboard::Key::F8:
 						m_window.close();
 						break;
@@ -86,6 +93,18 @@ void Game::readInputs()
 
 void Game::update()
 {
+	float base = m_camera.z / -Constants::Road::SegmentLength;
+	if(m_segments.size() <= base + 30)
+	{
+		m_player.stop();
+		m_text.setString(
+				"SESSION COMPLETED!\n\n"
+				"WELL DONE!\n\n"
+				"TOTAL TIME: 0:00\n\n"
+				);
+
+	}
+
 	m_player.update();
 
 	if(m_player.acceleration > 0.f && m_brrr.getStatus() != sf::Sound::Status::Playing) m_brrr.play();
@@ -154,6 +173,7 @@ void Game::render()
 			Constants::window.y - m_player.sprite.getGlobalBounds().height + sinf(m_player.position.z * 0.5f) );
 
 	m_window.draw(m_player.sprite);
+	m_window.draw(m_text);
 
 	m_window.display();
 }

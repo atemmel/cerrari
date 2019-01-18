@@ -42,6 +42,11 @@ struct Player
 	void brake();
 
 	/**
+	 *	@brief Stops the player.
+	 */
+	void stop();
+
+	/**
 	 * @brief Makes the player turn.
 	 * @param direction Direction for the player to turn.
 	 */
