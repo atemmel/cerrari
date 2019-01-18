@@ -4,11 +4,14 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed)
 		: m_window(window), m_road(20, 40, seed), m_quad(sf::PrimitiveType::Quads, 12u)
 {
 	m_bgTexture.loadFromFile("resources/bg.png");
+	m_playerTexture.loadFromFile("resources/ferrari.png");
+	m_brrrBuffer.loadFromFile("resources/brrr.ogg");
+	m_africa.openFromFile("resources/africa.ogg");
+
 	m_bgTexture.setRepeated(true);
 	m_background.setTexture(m_bgTexture);
 	m_background.setScale(1.2f, 1.2f);
 		
-	m_playerTexture.loadFromFile("resources/ferrari.png");
 	m_player.sprite.setTexture(m_playerTexture);
 	m_player.sprite.setTextureRect(sf::IntRect(m_player.spriteNormalPos, m_player.spriteDim) );
 	m_player.sprite.setScale(4.f, 4.f);
@@ -27,16 +30,14 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed)
 		m_background.setTextureRect(texRect);
 	}
 
-	m_brrrBuffer.loadFromFile("resources/brrr.ogg");
 	m_brrr.setBuffer(m_brrrBuffer);
 	m_brrr.setLoop(true);
 	m_brrr.setVolume(10.f);
 
-	m_africa.openFromFile("resources/africa.ogg");
 	m_africa.setVolume(30.f);
 	m_africa.play();
 	
-	m_segments = m_road.generate(8000);
+	m_segments = m_road.generate(200);
 }
 
 void Game::readInputs()

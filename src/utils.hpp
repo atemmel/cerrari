@@ -8,9 +8,19 @@
 
 #include <algorithm>
 
+/**
+ *	@brief Namespace for general utility functions
+ */
 namespace Utils
 {
 
+/**
+ *	@brief Function to modify a range into entering a curve
+ *	@param first Start of range.
+ *	@param last End of range.
+ *	@param enter Starting value.
+ *	@param exit Ending value.
+ */
 template<typename ForwardIterator>
 void enterCurve(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
@@ -24,6 +34,12 @@ void enterCurve(ForwardIterator first, ForwardIterator last, float enter, float 
 	}
 }
 
+/**
+ *	@brief Function to modify a range into holding a curve
+ *	@param first Start of range.
+ *	@param last End of range.
+ *	@param hold Value to hold.
+ */
 template<typename ForwardIterator>
 void holdCurve(ForwardIterator first, ForwardIterator last, float hold)
 {
@@ -33,6 +49,13 @@ void holdCurve(ForwardIterator first, ForwardIterator last, float hold)
 	});
 }
 
+/**
+ *	@brief Function to modify a range into exiting a curve
+ *	@param first Start of range.
+ *	@param last End of range.
+ *	@param enter Starting value.
+ *	@param exit Ending value.
+ */
 template<typename ForwardIterator>
 void exitCurve(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
@@ -46,6 +69,13 @@ void exitCurve(ForwardIterator first, ForwardIterator last, float enter, float e
 	}
 }
 
+/**
+ *	@brief Function to modify a range into transitioning from/into a hill.
+ *	@param first Start of range.
+ *	@param last End of range.
+ *	@param enter Starting value.
+ *	@param exit Ending value.
+ */
 template<typename ForwardIterator>
 void transitionHill(ForwardIterator first, ForwardIterator last, float enter, float exit)
 {
@@ -59,6 +89,12 @@ void transitionHill(ForwardIterator first, ForwardIterator last, float enter, fl
 	}
 }
 
+/**
+ *	@brief Function to modify a range into holding a hill
+ *	@param first Start of range.
+ *	@param last End of range.
+ *	@param hold Value to hold. .
+ */
 template<typename ForwardIterator>
 void holdHill(ForwardIterator first, ForwardIterator last, float hold)
 {
@@ -68,6 +104,16 @@ void holdHill(ForwardIterator first, ForwardIterator last, float hold)
 	});
 }
 
+/**
+ *	@brief Function to move a series of quads.
+ *	@param arr Array of vertices to modify.
+ *	@param near Lower segment..
+ *	@param nearWidth Width of lower segment.
+ *	@param far Upper segment..
+ *	@param farWidth Width of upper segment.
+ *	@param roadColor Color of the road.
+ *	@param offroadColor Color of the area next to the road.
+ */
 void moveQuad(sf::VertexArray & arr, sf::Vector2f near, float nearWidth, 
 		sf::Vector2f far, float farWidth, sf::Color roadColor, sf::Color offroadColor);
 
