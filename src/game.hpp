@@ -3,12 +3,11 @@
 
 #include "road.hpp"
 #include "player.hpp"
+#include "resourcemap.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
 
 /**
@@ -54,16 +53,17 @@ private:
 
 	sf::RenderWindow & m_window;
 	sf::Vector3f m_camera	= {0.f, 0.f, 1000.f};
-	sf::Texture m_playerTexture, m_bgTexture;
+	//sf::Texture m_playerTexture, m_bgTexture;
 	sf::Sprite m_background;
 	sf::VertexArray m_quad;
-	sf::SoundBuffer m_brrrBuffer;
+	//sf::SoundBuffer m_brrrBuffer;
 	sf::Sound m_brrr;
 	sf::Music m_africa;
-	sf::Font m_font;
+	//sf::Font m_font;
 	sf::Text m_text;
 	sf::Clock m_clock;
 
+	ResourceMap m_resources;
 	Road m_road;
 	Road::Segments m_segments;
 	Player m_player;

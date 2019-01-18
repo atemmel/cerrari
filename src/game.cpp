@@ -3,22 +3,26 @@
 Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 		: m_window(window), m_road(20, 40, seed), m_quad(sf::PrimitiveType::Quads, 12u)
 {
-	m_bgTexture.loadFromFile("resources/bg.png");
-	m_playerTexture.loadFromFile("resources/ferrari.png");
-	m_brrrBuffer.loadFromFile("resources/brrr.ogg");
-	m_font.loadFromFile("resources/font.ttf");
-	m_africa.openFromFile("resources/africa.ogg");
+	m_resources.loadFromFile<MyFont>("resources/font.ttf");
+	m_resources.loadFromFile<MyTexture>("resources/bg.png");
+	m_resources.loadFromFile<MyTexture>("resources/ferrari.png");
+	m_resources.loadFromFile<MySoundBuffer>("resources/brrr.ogg");
 
-	m_bgTexture.setRepeated(true);
-	m_background.setTexture(m_bgTexture);
+	m_africa.openFromFile("resources/africa.ogg");
+	m_resources.access<MyTexture>("resources/bg.png")->setRepeated(true);
+
+	m_text.setFont(*m_resources.access<MyFont>("resources/font.ttf") );
+	m_background.setTexture(*m_resources.access<MyTexture>("resources/bg.png") );
+	m_player.sprite.setTexture(*m_resources.access<MyTexture>("resources/ferrari.png") );
+	m_brrr.setBuffer(*m_resources.access<MySoundBuffer>("resources/brrr.ogg") );
+
 	m_background.setScale(1.2f, 1.2f);
-	m_text.setFont(m_font);
 	m_text.setCharacterSize(80);
 	m_text.setOutlineColor(sf::Color::Black);
 	m_text.setOutlineThickness(5u);
 	m_text.setPosition(100.f, 100.f);
 		
-	m_player.sprite.setTexture(m_playerTexture);
+	//m_player.sprite.setTexture(m_playerTexture);
 	m_player.sprite.setTextureRect(sf::IntRect(m_player.spriteNormalPos, m_player.spriteDim) );
 	m_player.sprite.setScale(4.f, 4.f);
 	m_player.position = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
@@ -36,7 +40,7 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 		m_background.setTextureRect(texRect);
 	}
 
-	m_brrr.setBuffer(m_brrrBuffer);
+	//m_brrr.setBuffer(m_brrrBuffer);
 	m_brrr.setLoop(true);
 	m_brrr.setVolume(10.f);
 
