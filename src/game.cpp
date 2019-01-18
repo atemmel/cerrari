@@ -1,6 +1,6 @@
 #include "game.hpp"
 
-Game::Game(sf::RenderWindow & window, Road::Seed seed)
+Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 		: m_window(window), m_road(20, 40, seed), m_quad(sf::PrimitiveType::Quads, 12u)
 {
 	m_bgTexture.loadFromFile("resources/bg.png");
@@ -43,7 +43,7 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed)
 	m_africa.setVolume(30.f);
 	m_africa.play();
 	
-	m_segments = m_road.generate(200);
+	m_segments = m_road.generate(length);
 }
 
 void Game::readInputs()

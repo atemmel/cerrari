@@ -21,8 +21,9 @@ public:
 	 *		@brief Parametrized constructor.
 	 *		@param window The window the game will operate on.
 	 *		@param seed A seed for the game to generate a road from.
+	 *		@param length Track length
 	 */
-	Game(sf::RenderWindow & window, Road::Seed seed);
+	Game(sf::RenderWindow & window, Road::Seed seed, unsigned length);
 
 	/**
 	 *		@brief Reads inputs from the associated `sf::RenderWindow.`
