@@ -14,15 +14,19 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 	m_text.setFont(*m_resources.access<MyFont>("resources/font.ttf") );
 	m_background.setTexture(*m_resources.access<MyTexture>("resources/bg.png") );
 	m_player.sprite.setTexture(*m_resources.access<MyTexture>("resources/ferrari.png") );
-	m_brrr.setBuffer(*m_resources.access<MySoundBuffer>("resources/brrr.ogg") );
+	m_carSound.setBuffer(*m_resources.access<MySoundBuffer>("resources/brrr.ogg") );
 
 	m_background.setScale(1.2f, 1.2f);
 	m_text.setCharacterSize(80);
 	m_text.setOutlineColor(sf::Color::Black);
 	m_text.setOutlineThickness(5u);
+	m_speedometer = m_text;
+	m_speedometer.setCharacterSize(40u);
+	m_speedometer.setOutlineThickness(2u);
+
 	m_text.setPosition(100.f, 100.f);
+	m_speedometer.setPosition(10.f, 10.f);
 		
-	//m_player.sprite.setTexture(m_playerTexture);
 	m_player.sprite.setTextureRect(sf::IntRect(m_player.spriteNormalPos, m_player.spriteDim) );
 	m_player.sprite.setScale(4.f, 4.f);
 	m_player.position = {0.f, 0.f, -(Constants::Road::SegmentLength * 3.2f)};
@@ -40,11 +44,11 @@ Game::Game(sf::RenderWindow & window, Road::Seed seed, unsigned length)
 		m_background.setTextureRect(texRect);
 	}
 
-	//m_brrr.setBuffer(m_brrrBuffer);
-	m_brrr.setLoop(true);
-	m_brrr.setVolume(10.f);
+	m_carSound.setLoop(true);
+	m_carSound.setVolume(10.f);
 
 	m_africa.setVolume(30.f);
+	m_africa.setLoop(true);
 	m_africa.play();
 	
 	m_segments = m_road.generate(length);
@@ -109,25 +113,34 @@ void Game::update()
 		int minutes = time.asSeconds() / 60.f;
 		int seconds = time.asSeconds() - 60.f * minutes;
 
+		std::string strMinutes = std::to_string(minutes);
+		std::string strSeconds = std::to_string(seconds);
+
+		if(strSeconds.size() == 1) strSeconds = '0' + strSeconds;
+
 		m_text.setString(
 				"SESSION COMPLETED!\n\n"
 				"WELL DONE!\n\n"
-				"TOTAL TIME: " 
-				 + std::to_string(minutes) + ':'
-				 + std::to_string(seconds) + "\n\n\n\n"
-				"ESC TO EXIT"
+				"TOTAL TIME:\t" 
+				 + strMinutes + ':'
+				 + strSeconds + "\n\n\n\n"
+				"PRESS ESC TO EXIT"
 				);
-		
+
+		m_speedometer.setString("");
 		m_finished = true;
+		return;
 	}
 
 	m_player.update();
 
-	if(m_player.acceleration > 0.f && m_brrr.getStatus() != sf::Sound::Status::Playing) m_brrr.play();
-	else if(m_player.acceleration <= 0.f) m_brrr.stop();
+	if(m_player.acceleration > 0.f && m_carSound.getStatus() != sf::Sound::Status::Playing) m_carSound.play();
+	else if(m_player.acceleration <= 0.f) m_carSound.stop();
 
 	m_camera.z = m_player.position.z + (Constants::Road::SegmentLength * 3.2f) + 1000.f;
 	m_camera.x = m_player.position.x;
+
+	m_speedometer.setString(std::to_string(int(-m_player.velocity.z / 5.f) ) + "km/h");
 }
 
 void Game::render()
@@ -154,7 +167,7 @@ void Game::render()
 		- Constants::Road::MaxHeight;
 
 
-	for(size_t i = base; i < m_segments.size() && i < base + 30; i++) //TODO: Remove constant
+	for(size_t i = base; i < m_segments.size() && i < base + 30; i++)
 	{
 		auto & seg = m_segments[i];
 		auto & seg2 = m_segments[i + 1];
@@ -172,15 +185,14 @@ void Game::render()
 		if(	screen2.y > Constants::window.y 		||	//Utanför skärmens gränser
 			minY < screen2.y  						||	//Bakom en kulle
 			screen2.z < Constants::window.x / 60.f		//För smal för att renderas	
-		) continue; 									//TODO: Remove constant
+		) continue;
 
 		if(minY > screen2.y) minY = screen2.y;
 
 		Utils::moveQuad(m_quad, {screen1.x, screen1.y}, screen1.z, {screen2.x, screen2.y}, screen2.z,
 				i % 2 == 0 ? sf::Color(100, 100, 100) : sf::Color(120, 120, 120), 
-				////i % 2 == 0 ? sf::Color(80, 200, 80) : sf::Color(50, 0, 200) 
 				i % 2 == 0 ? sf::Color(87 + 40, 66 + 40, 25) : sf::Color(63, 49, 15)
-		); //TODO: Remove constant
+		); 
 
 		m_window.draw(m_quad);
 	}
@@ -190,6 +202,7 @@ void Game::render()
 
 	m_window.draw(m_player.sprite);
 	m_window.draw(m_text);
+	m_window.draw(m_speedometer);
 
 	m_window.display();
 }

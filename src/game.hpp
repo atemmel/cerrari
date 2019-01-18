@@ -53,14 +53,11 @@ private:
 
 	sf::RenderWindow & m_window;
 	sf::Vector3f m_camera	= {0.f, 0.f, 1000.f};
-	//sf::Texture m_playerTexture, m_bgTexture;
 	sf::Sprite m_background;
 	sf::VertexArray m_quad;
-	//sf::SoundBuffer m_brrrBuffer;
-	sf::Sound m_brrr;
+	sf::Sound m_carSound;
 	sf::Music m_africa;
-	//sf::Font m_font;
-	sf::Text m_text;
+	sf::Text m_text, m_speedometer;
 	sf::Clock m_clock;
 
 	ResourceMap m_resources;
