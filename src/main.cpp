@@ -83,7 +83,7 @@ static unsigned readInt(const std::string & str)
 static void help()
 {
 	std::cout <<
-		"cerrari is a causal game in which you pilot a ferrari\n"
+		"cerrari is a casual game in which you pilot a ferrari\n"
 		"through a procedurally generated course\n\n"
 		"Options:\n"
 		"-h, --help\t: Display this text\n"

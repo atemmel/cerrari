@@ -51,9 +51,9 @@ public:
 
 	/**
 	 *	@brief Parametrizied constructor.
-	 *	@param min Minimum subsequnce length.
-	 *	@param max Maximum subsequnce length.
-	 *	@oaram seed Seed to generate sequnce from
+	 *	@param min Minimum subsequence length.
+	 *	@param max Maximum subsequence length.
+	 *	@param seed Seed to generate sequence from
 	 */
 	Road(unsigned min, unsigned max, Seed seed);
 

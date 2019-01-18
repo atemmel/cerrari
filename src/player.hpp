@@ -8,6 +8,9 @@
 
 /**
  *	@brief Structure for maintaining a player.
+ *	
+ *	The structure is intended to be moderately open, as a lot of its responsibilites are 
+ *	to just contain the correct data.
  */
 struct Player
 {
@@ -55,6 +58,10 @@ struct Player
 	sf::Sprite sprite;
 	sf::Vector3f position;
 	sf::Vector3f velocity;
+
+	/**
+	 *	@brief Acceleration is only calculated for the z-axis.
+	 */
 	float acceleration = 0.f;
 
 	/**
@@ -63,11 +70,20 @@ struct Player
 	constexpr static float maxVelocity = 500.f;
 
 	/**
-	 *	@brief Dimensions and positions for the associated texturerect..
+	 *	@brief Dimension for the associated texturerect.
 	 */
 	const sf::Vector2i spriteDim {63, 35};
+	/**
+	 *	@brief Position for the associated texturerect.
+	 */
 	const sf::Vector2i spriteNormalPos {144, 12};
+	/**
+	 *	@brief Left dimensions for the associated texturerect.
+	 */
 	const sf::Vector2i spriteLeftDim {63,35};
+	/**
+	 *	@brief Left position for the associated texturerect.
+	 */
 	const sf::Vector2i spriteLeftPos {0, 12};
 private:
 	constexpr static float accPerTick = 20.f;

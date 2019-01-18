@@ -17,7 +17,7 @@ public:
 	/**
 	 *	@brief Loads resource of given type from file.
 	 *	@param path Path to file.
-	 *	@note If resource can not be loaded, the process will call `exit`.
+	 *	@note If the resource can not be loaded, the function will call `std::terminate`.
 	 */
 	template<typename T>
 	void loadFromFile(const std::string & path)
@@ -39,19 +39,19 @@ public:
 	 *	@param path Path to file.
 	 *	@return Pointer of given type to resource.
 	 *	@note Attempts to load resource if resource can not be accessed. 
-	 *	Will call `exit` if the resource can not be loaded.
+	 *	Will call `std::terminate` if the resource can not be loaded.
 	 */
 	template<typename T>
 	T* access(const std::string & path)
 	{
-		auto ptr = m_map.find(path);
+		auto itr = m_map.find(path);
 
-		if(ptr == m_map.end() ) //If resource does not exist, load it
+		if(itr == m_map.end() ) //If resource does not exist, load it
 		{
 			loadFromFile<T>(path);
 		}
 			
-		return static_cast<T*>(ptr->second.get());
+		return static_cast<T*>(itr->second.get());
 	}
 
 private:
