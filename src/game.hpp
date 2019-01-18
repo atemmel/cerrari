@@ -66,6 +66,7 @@ private:
 	Road m_road;
 	Road::Segments m_segments;
 	Player m_player;
+	bool m_finished = 0;
 
 	constexpr static float fov = 100.f;
 };

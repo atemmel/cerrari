@@ -93,16 +93,28 @@ void Game::readInputs()
 
 void Game::update()
 {
+	if(m_finished) return;
+
 	float base = m_camera.z / -Constants::Road::SegmentLength;
 	if(m_segments.size() <= base + 30)
 	{
 		m_player.stop();
+
+		sf::Time time = m_clock.restart();
+
+		int minutes = time.asSeconds() / 60.f;
+		int seconds = time.asSeconds() - 60.f * minutes;
+
 		m_text.setString(
 				"SESSION COMPLETED!\n\n"
 				"WELL DONE!\n\n"
-				"TOTAL TIME: 0:00\n\n"
+				"TOTAL TIME: " 
+				 + std::to_string(minutes) + ':'
+				 + std::to_string(seconds) + "\n\n\n\n"
+				"ESC TO EXIT"
 				);
-
+		
+		m_finished = true;
 	}
 
 	m_player.update();
